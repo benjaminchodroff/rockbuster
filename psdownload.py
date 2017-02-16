@@ -1,9 +1,11 @@
 import os
-import urllib
+try:
+    from urllib.request import Request, urlopen  # Python 3
+except:
+        from urllib2 import Request, urlopen  # Python 2
 import pdb
 import sys
-import math
-import threading
+#import math
 import collections
 
 min = float(sys.argv[1])
@@ -43,7 +45,7 @@ for t in dtype:
                 print "   Skipping page " + str(i) + "/20"
                 continue
             print "   Downloading page " + str(i) + "/20"
-            pages[t][i+inc] = urllib.urlopen((
+            q = Request(
                 "http://www.pricescope.com/results/ajax/?" 
                 "vendor__latitude__gte=-180&type_color=1&vendor__region__contains=&clarity__lte=27&vendor__longitude__gte=-180" 
                 "&shape=" + t + "&price__lte=999999&city=Richmond&hca_index__lte=10&search_key=sk_session_3068" 
@@ -59,7 +61,9 @@ for t in dtype:
                 "&color__gte=D"
                 "&vlt_l_ct=180&sort=size"
                 "&page="+str(i)
-                )).readlines()
+                )
+            q.add_header('User-agent','Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5')
+            pages[t][i+inc] = urlopen(q).readlines()
             found = 0
             for line in pages[t][i+inc]:
                 if line.find("diamond-data") > 0:
@@ -81,6 +85,6 @@ for i in diamonds:
 f.close()
 
 
-#print "Entering interactive debugger"
-#pdb.set_trace()
+print "Entering interactive debugger"
+pdb.set_trace()
 
